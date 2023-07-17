@@ -1,4 +1,4 @@
-import { useSignal } from "@preact/signals-react";
+import { useObservable } from "@legendapp/state/react";
 
 import * as Components from "@/components";
 import { NextPageWithLayout } from "@/pages/_app";
@@ -7,8 +7,8 @@ import { signalsStore } from "@/signals/signals";
 const Register: NextPageWithLayout = () => {
   const { authVerificationCodeSent } = signalsStore;
 
-  const email = useSignal("");
-  const agreementChecked = useSignal(false);
+  const email = useObservable("");
+  const agreementChecked = useObservable(false);
 
   return (
     <>
@@ -17,7 +17,7 @@ const Register: NextPageWithLayout = () => {
       {authVerificationCodeSent.value ? (
         <Components.AuthVerification
           type="Register"
-          email={email.value}
+          email={email.get()}
           authVerificationCodeSent={authVerificationCodeSent}
           agreementChecked={agreementChecked}
         />

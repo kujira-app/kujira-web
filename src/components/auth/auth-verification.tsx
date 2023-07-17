@@ -1,4 +1,6 @@
-import { Signal, effect, useSignal } from "@preact/signals-react";
+import { ObservablePrimitiveBaseFns } from "@legendapp/state";
+import { useObservable } from "@legendapp/state/react";
+import { Signal, effect } from "@preact/signals-react";
 import { useDispatch } from "react-redux";
 
 import * as Components from "@/components";
@@ -11,14 +13,15 @@ import TextStyles from "@/styles/texts.module.scss";
 type Props = {
   email: string;
   authVerificationCodeSent: Signal<boolean>;
-  agreementChecked: Signal<boolean>;
+  agreementChecked: ObservablePrimitiveBaseFns<boolean>;
 } & Types.AuthFormProps;
 
 export const AuthVerification = (props: Props) => {
+
   const dispatch = useDispatch();
 
-  const verificationCode = useSignal("");
-  const verificationCodeError = useSignal("");
+  const verificationCode = useObservable("");
+  const verificationCodeError = useObservable("");
 
   function goBack(): void {
     props.authVerificationCodeSent.value = false;
@@ -29,17 +32,17 @@ export const AuthVerification = (props: Props) => {
   }
 
   function handleButtonDisable(): boolean {
-    return verificationCode.value === "" || !!verificationCodeError.value;
+    return verificationCode.get() === "" || !!verificationCodeError.get();
   }
 
   effect(() => {
-    if (verificationCode.value.length === 0) {
-      verificationCodeError.value = "";
+    if (verificationCode.get().length === 0) {
+      verificationCodeError.set("");
     } else {
-      if (!Number(verificationCode.value)) {
-        verificationCodeError.value = "Must be a number.";
+      if (!Number(verificationCode.get())) {
+        verificationCodeError.set("Must be a number.");
       } else {
-        verificationCodeError.value = "";
+        verificationCodeError.set("");
       }
     }
   });
@@ -52,15 +55,15 @@ export const AuthVerification = (props: Props) => {
         dispatch(
           Sagas.verifyRegistrationRequest({
             email: props.email,
-            verificationCode: verificationCode.value,
+            verificationCode: verificationCode.get(),
           })
         );
       } else {
         dispatch(
           Sagas.verifyLoginRequest({
             email: props.email,
-            verificationCode: verificationCode.value,
-            thirtyDays: props.agreementChecked.value,
+            verificationCode: verificationCode.get(),
+            thirtyDays: props.agreementChecked.get(),
           })
         );
       }
@@ -102,8 +105,8 @@ export const AuthVerification = (props: Props) => {
       </header>
 
       <article className={Styles.group}>
-        {verificationCodeError.value && (
-          <p className={TextStyles.formError}>{verificationCodeError.value}</p>
+        {verificationCodeError.get() && (
+          <p className={TextStyles.formError}>{verificationCodeError.get()}</p>
         )}
         <Components.Input
           type="text"

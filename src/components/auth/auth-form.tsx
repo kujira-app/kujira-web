@@ -1,4 +1,6 @@
-import { Signal, useSignal } from "@preact/signals-react";
+import { Signal } from "@preact/signals-react";
+import { ObservablePrimitiveBaseFns } from "@legendapp/state";
+import { useObservable } from "@legendapp/state/react";
 import { useDispatch } from "react-redux";
 
 import * as Components from "@/components";
@@ -12,42 +14,43 @@ import { AuthFormAgreement } from "./auth-form-agreement";
 import Styles from "./auth-form.module.scss";
 
 type Props = {
-  email: Signal<string>;
+  email: ObservablePrimitiveBaseFns<string>;
   authVerificationCodeSent: Signal<boolean>;
-  agreementChecked: Signal<boolean>;
+  agreementChecked: ObservablePrimitiveBaseFns<boolean>;
 } & Types.AuthFormProps;
 
 export const AuthForm = (props: Props) => {
+
   const dispatch = useDispatch();
 
-  const username = useSignal("");
-  const password = useSignal("");
-  const confirmPassword = useSignal("");
+  const username = useObservable("");
+  const password = useObservable("");
+  const confirmPassword = useObservable("");
 
-  const emailError = useSignal("");
-  const usernameError = useSignal("");
-  const passwordError = useSignal("");
-  const confirmPasswordError = useSignal("");
+  const emailError = useObservable("");
+  const usernameError = useObservable("");
+  const passwordError = useObservable("");
+  const confirmPasswordError = useObservable("");
 
   function handleButtonDisable(): boolean {
     if (props.type === "Register") {
       return (
-        props.email.value === "" ||
-        username.value === "" ||
-        password.value === "" ||
-        confirmPassword.value === "" ||
-        !!emailError.value ||
-        !!usernameError.value ||
-        !!passwordError.value ||
-        !!confirmPasswordError.value ||
-        !props.agreementChecked.value
+        props.email.get() === "" ||
+        username.get() === "" ||
+        password.get() === "" ||
+        confirmPassword.get() === "" ||
+        !!emailError.get() ||
+        !!usernameError.get() ||
+        !!passwordError.get() ||
+        !!confirmPasswordError.get() ||
+        !props.agreementChecked.get()
       );
     } else {
       return (
-        props.email.value === "" ||
-        password.value === "" ||
-        !!emailError.value ||
-        !!passwordError.value
+        props.email.get() === "" ||
+        password.get() === "" ||
+        !!emailError.get() ||
+        !!passwordError.get()
       );
     }
   }
@@ -59,16 +62,16 @@ export const AuthForm = (props: Props) => {
       if (props.type === "Register") {
         dispatch(
           Sagas.registerRequest({
-            email: props.email.value,
-            username: username.value,
-            password: password.value,
+            email: props.email.get(),
+            username: username.get(),
+            password: password.get(),
           })
         );
       } else {
         dispatch(
           Sagas.loginRequest({
-            email: props.email.value,
-            password: password.value,
+            email: props.email.get(),
+            password: password.get(),
           })
         );
       }

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Signal } from "@preact/signals-react";
+import { ObservablePrimitiveBaseFns } from "@legendapp/state";
+import { observer } from "@legendapp/state/react";
 
 import * as Components from "@/components";
 import * as Constants from "@/constants";
@@ -9,16 +10,19 @@ import * as Types from "@/types";
 import Styles from "./auth-form-agreement.module.scss";
 import TextStyles from "@/styles/texts.module.scss";
 
-type Props = { agreementChecked: Signal<boolean> } & Types.AuthFormProps;
+type Props = {
+  agreementChecked: ObservablePrimitiveBaseFns<boolean>;
+} & Types.AuthFormProps;
 
-export const AuthFormAgreement = (props: Props) => {
+export const AuthFormAgreement = observer((props: Props) => {
+
   function toggleAgreement(): void {
-    props.agreementChecked.value = !props.agreementChecked.value;
+    props.agreementChecked.set(!props.agreementChecked.get());
   }
 
   return (
     <section className={Styles.section} onClick={toggleAgreement}>
-      {props.agreementChecked.value ? (
+      {props.agreementChecked.get() ? (
         <Components.ButtonIcon continuePropagation>
           <Components.CheckboxActive width={18} fill={12} />
         </Components.ButtonIcon>
@@ -64,4 +68,4 @@ export const AuthFormAgreement = (props: Props) => {
       )}
     </section>
   );
-};
+});

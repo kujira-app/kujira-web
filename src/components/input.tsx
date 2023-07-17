@@ -1,4 +1,5 @@
-import { Signal, useSignal } from "@preact/signals-react";
+import { ObservablePrimitiveBaseFns } from "@legendapp/state";
+import { observer, useObservable } from "@legendapp/state/react";
 import { useRef } from "react";
 
 import * as Components from "@/components";
@@ -9,7 +10,7 @@ import Styles from "./input.module.scss";
 
 type Props = {
   type: "text" | "email" | "password";
-  userInput: Signal<string>;
+  userInput: ObservablePrimitiveBaseFns<string>;
   placeholder: string;
 
   leftIcon?: JSX.Element;
@@ -21,17 +22,17 @@ type Props = {
   mini?: true;
 };
 
-export const Input = (props: Props) => {
+export const Input = observer((props: Props) => {
   const inputRef = useRef<any>(null);
-  const focused = useSignal(false);
-  const inputType = useSignal(props.type);
+  const focused = useObservable(false);
+  const inputType = useObservable(props.type);
 
   function setUserInput(event: Types.OnChange): void {
-    props.userInput.value = event.currentTarget.value;
+    props.userInput.set(event.currentTarget.value);
   }
 
   function setFocused(state: boolean): void {
-    focused.value = state;
+    focused.set(state);
   }
 
   function focusInput(): void {
@@ -42,15 +43,15 @@ export const Input = (props: Props) => {
   }
 
   function togglePasswordVisibility(): void {
-    if (inputType.value === "password") inputType.value = "text";
-    else inputType.value = "password";
+    if (inputType.get() === "password") inputType.set("text");
+    else inputType.set("password");
   }
 
   return (
     <article
       className={`
         ${Styles.size} ${props.mini ? Styles.mini : Styles.default}
-        ${Helpers.setBackgroundLevel(props.backgroundLevel || 1, focused.value)}
+        ${Helpers.setBackgroundLevel(props.backgroundLevel || 1, focused.get())}
         ${Helpers.setClickLevel(props.backgroundLevel || 1)}
         ${Helpers.setHoverLevel(props.backgroundLevel || 1)}
       `}
@@ -66,9 +67,9 @@ export const Input = (props: Props) => {
 
       <input
         className={Styles.input}
-        type={inputType.value}
+        type={inputType.get()}
         onChange={setUserInput}
-        value={props.userInput.value}
+        value={props.userInput.get()}
         placeholder={props.placeholder}
         ref={inputRef}
         onFocus={() => setFocused(true)}
@@ -78,7 +79,7 @@ export const Input = (props: Props) => {
 
       {props.isPassword && (
         <Components.ButtonIcon onClick={togglePasswordVisibility}>
-          {inputType.value === "password" ? (
+          {inputType.get() === "password" ? (
             <Components.EyeHidden width={16} fill={8} hoverFill={11} addHover />
           ) : (
             <Components.EyeVisible
@@ -92,4 +93,4 @@ export const Input = (props: Props) => {
       )}
     </article>
   );
-};
+});
