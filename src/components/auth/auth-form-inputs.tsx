@@ -1,5 +1,5 @@
 import { ObservablePrimitiveBaseFns } from "@legendapp/state";
-import { effect } from "@preact/signals-react";
+import { observer, useObserve } from "@legendapp/state/react";
 
 import * as Components from "@/components";
 import * as Helpers from "@/helpers";
@@ -19,8 +19,7 @@ type Props = {
   confirmPasswordError: ObservablePrimitiveBaseFns<string>;
 } & Types.AuthFormProps;
 
-export const AuthFormInputs = (props: Props) => {
-
+export const AuthFormInputs = observer((props: Props) => {
   function handleEmailErrors(): void {
     if (props.email.get().length === 0) {
       props.emailError.set("");
@@ -77,7 +76,7 @@ export const AuthFormInputs = (props: Props) => {
     }
   }
 
-  effect(() => {
+  useObserve(() => {
     handleEmailErrors();
     if (props.type === "Register") {
       handleUsernameErrors();
@@ -157,4 +156,4 @@ export const AuthFormInputs = (props: Props) => {
       )}
     </article>
   );
-};
+});

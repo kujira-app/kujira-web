@@ -1,6 +1,6 @@
 import { Signal } from "@preact/signals-react";
 import { ObservablePrimitiveBaseFns } from "@legendapp/state";
-import { useObservable } from "@legendapp/state/react";
+import { observer, useObservable } from "@legendapp/state/react";
 import { useDispatch } from "react-redux";
 
 import * as Components from "@/components";
@@ -19,8 +19,7 @@ type Props = {
   agreementChecked: ObservablePrimitiveBaseFns<boolean>;
 } & Types.AuthFormProps;
 
-export const AuthForm = (props: Props) => {
-
+export const AuthForm = observer((props: Props) => {
   const dispatch = useDispatch();
 
   const username = useObservable("");
@@ -109,4 +108,4 @@ export const AuthForm = (props: Props) => {
       />
     </form>
   );
-};
+});
